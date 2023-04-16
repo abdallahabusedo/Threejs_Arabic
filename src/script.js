@@ -42,37 +42,10 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height);
 renderer.render(scene, camera);
 
-// method 1 using Date.now
-let time = Date.now();
-
-// method 2 using Clock class
 const clock = new THREE.Clock();
 
 const tick = () => {
-  //method 1
-  // const currentTime = Date.now();
-  // const deltaTime = currentTime - time;
-  // time = currentTime;
-  // cube.rotation.y += 0.01 * deltaTime;
-
-  // method 2
   const elapsedTime = clock.getElapsedTime();
-  // cube.rotation.y = elapsedTime;
-
-  // animation 1
-  // cube.rotation.x = elapsedTime;
-
-  // animation 2
-  // cube.scale.x = Math.sin(elapsedTime);
-
-  // animation 3
-  // cube.position.x = Math.cos(elapsedTime) * 10;
-  // cube.position.y = Math.sin(elapsedTime) * 10;
-
-  // animation 4
-  // camera.position.x = Math.cos(elapsedTime) * 10;
-  // camera.position.y = Math.sin(elapsedTime) * 10;
-  // camera.lookAt(cube.position);
 
   renderer.render(scene, camera);
   window.requestAnimationFrame(tick);
