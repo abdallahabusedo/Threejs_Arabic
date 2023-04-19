@@ -48,7 +48,7 @@ const cube = new THREE.Mesh(
 // don't forget to add it to the scene
 scene.add(cube);
 
-// Camera
+//! PerspectiveCamera
 const camera = new THREE.PerspectiveCamera(
   // Fov
   75,
@@ -57,16 +57,55 @@ const camera = new THREE.PerspectiveCamera(
   // near
   0.1,
   // far
-  100
+  1000
 );
+
 // moving the camera far from us to see the cube
 camera.position.z = 20;
 
-// add te camera to the sceen
+// add te camera to the scene
 scene.add(camera);
 
+//! OrthographicCamera
+// const aspectRatio = sizes.width / sizes.height;
+// const OrthographicCamera = new THREE.OrthographicCamera(
+//   // left
+//   -1,
+//   // right
+//   1,
+//   // top
+//   1,
+//   // bottom
+//   -1,
+//   // near
+//   0.1,
+//   // far
+//   100
+// );
+// camera.position.z = 20;
+// scene.add(OrthographicCamera);
 // add the orbitControl
 const controls = new OrbitControls(camera, canvas);
+
+//! Cursor Events
+//! why outside the event listener because of the js scoping
+const cursor = {
+  x: 0,
+  y: 0,
+};
+//! add the event listener mousemove
+window.addEventListener("mousemove", (event) => {
+  //! --1-- check the event object
+  // console.log(event.clientX, event.clientY)
+  //! --2-- update the value of the cursor
+  // cursor.x = event.clientX;
+  // cursor.y = event.clientY;
+  //! --3-- normalize the value of the cursor
+  // cursor.x = event.clientX / sizes.width - 0.5;
+  // cursor.y = event.clientY / sizes.height - 0.5;
+  //! check the values
+  // console.log(cursor.x, cursor.y);
+});
 
 // pass the canvas to the renderer
 const renderer = new THREE.WebGLRenderer({
@@ -77,42 +116,33 @@ renderer.setSize(sizes.width, sizes.height);
 // pass the scene and the camera to the renderer
 renderer.render(scene, camera);
 
-//! method 1 using Date.now
-let time = Date.now();
-
-//! method 2 using Clock class
+// get the clock class from three js
 const clock = new THREE.Clock();
 
-const tick = () => {
-  //! method 1
-  // const currentTime = Date.now();
-  // const deltaTime = currentTime - time;
-  // time = currentTime;
-  // cube.rotation.y += 0.01 * deltaTime;
-
-  //! method 2
+// animate function
+const animate = () => {
+  // get the elapsedTime from the clock class
   const elapsedTime = clock.getElapsedTime();
-  // cube.rotation.y = elapsedTime;
 
-  //! animation 1
-  // cube.rotation.x = elapsedTime;
+  //! --1-- update the camera (**don't forget the - in the y direction**)
+  // camera.position.x = cursor.x
+  // camera.position.y = cursor.y
 
-  //! animation 2
-  // cube.scale.x = Math.sin(elapsedTime);
+  //! --2--
+  // camera.position.x = cursor.x * 5;
+  // camera.position.y = cursor.y * 5;
+  // camera.lookAt(mesh.position);
 
-  //! animation 3
-  // cube.position.x = Math.cos(elapsedTime) * 10;
-  // cube.position.y = Math.sin(elapsedTime) * 10;
-
-  //! animation 4
-  // camera.position.x = Math.cos(elapsedTime) * 10;
-  // camera.position.y = Math.sin(elapsedTime) * 10;
-  // camera.lookAt(cube.position);
+  //! --3--
+  // camera.position.x = Math.sin(cursor.x * Math.PI * 2) * 2;
+  // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 2;
+  // camera.position.y = cursor.y * 3;
+  // camera.lookAt(mesh.position);
 
   // render the renderer every frame
   renderer.render(scene, camera);
   // call the function every frame
-  window.requestAnimationFrame(tick);
+  window.requestAnimationFrame(animate);
 };
 // function call
-tick();
+animate();
