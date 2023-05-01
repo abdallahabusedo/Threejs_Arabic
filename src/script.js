@@ -1,5 +1,26 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import gsap from "gsap"; // npm install gsap
+
+/**
+ * ! Step 1
+ * npm install --save lil-gui
+ */
+
+/**
+ * ! Step 2
+ */
+import * as dat from "lil-gui";
+/**
+ * Debug
+ */
+const gui = new dat.GUI();
+const parameters = {
+  color: 0xff0000,
+  spin: () => {
+    gsap.to(mesh.rotation, { duration: 1, y: mesh.rotation.y + Math.PI * 2 });
+  },
+};
 
 const scene = new THREE.Scene();
 
@@ -24,10 +45,23 @@ window.addEventListener("resize", () => {
  */
 const mesh = new THREE.Mesh(
   new THREE.BoxGeometry(4, 4, 4),
-  new THREE.MeshBasicMaterial({ color: 0xff0000 })
+  new THREE.MeshBasicMaterial({ color: parameters.color })
 );
 scene.add(mesh);
 
+/**
+ * Tweaks
+ */
+gui.add(mesh.position, "y");
+gui.add(mesh.position, "x", -3, 3, 0.01);
+gui.add(mesh.position, "z").min(-3).max(3).step(0.01).name("elevation");
+gui.add(mesh, "visible");
+gui.add(mesh.material, "wireframe");
+console.log(mesh.material.color);
+gui.addColor(parameters, "color").onChange(() => {
+  mesh.material.color.set(parameters.color);
+});
+gui.add(parameters, "spin");
 const camera = new THREE.PerspectiveCamera(
   75,
   sizes.width / sizes.height,
