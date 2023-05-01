@@ -19,11 +19,15 @@ window.addEventListener("resize", () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-const cube = new THREE.Mesh(
+/**
+ * Cube
+ */
+const mesh = new THREE.Mesh(
   new THREE.BoxGeometry(4, 4, 4),
   new THREE.MeshBasicMaterial({ color: 0xff0000 })
 );
-scene.add(cube);
+scene.add(mesh);
+
 const camera = new THREE.PerspectiveCamera(
   75,
   sizes.width / sizes.height,
