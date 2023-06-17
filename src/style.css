@@ -14,3 +14,14 @@ body {
   left: 0;
   outline: none;
 }
+
+.me {
+  position: absolute;
+  top: 50px;
+  left: 100px;
+  z-index: 10;
+  color: white;
+  font-size: large;
+  display: flex;
+  flex-direction: column;
+}
