@@ -2,6 +2,12 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import * as dat from "lil-gui";
 
+/**
+ * Textures
+ */
+const textureLoader = new THREE.TextureLoader();
+const bakedShadow = textureLoader.load("/textures/bakedShadow.jpg");
+const simpleShadow = textureLoader.load("/textures/simpleShadow.jpg");
 const scene = new THREE.Scene();
 THREE.ColorManagement.enabled = false;
 
@@ -27,16 +33,42 @@ window.addEventListener("resize", () => {
   renderer.setSize(sizes.width, sizes.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
-const material = new THREE.MeshStandardMaterial();
+
+/*******************************/
+/*******************************/
+/*          Shapes             */
+/*******************************/
+/*******************************/
+const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
 const sphere = new THREE.Mesh(new THREE.SphereGeometry(2, 32, 32), material);
-sphere.castShadow = true;
+
+sphere.castShadow = false;
+sphere.position.y = 1;
 scene.add(sphere);
-const plane = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), material);
-plane.material.side = THREE.DoubleSide;
-plane.rotation.x = Math.PI * 0.5;
+const plane = new THREE.Mesh(
+  new THREE.PlaneGeometry(20, 20),
+  new THREE.MeshBasicMaterial({
+    // map: bakedShadow
+    color: 0xffff00,
+  })
+);
+
+// plane.material.side = THREE.DoubleSide;
+plane.rotation.x = -Math.PI * 0.5;
 plane.position.y = -2;
 plane.receiveShadow = true;
 scene.add(plane);
+const sphereShadow = new THREE.Mesh(
+  new THREE.PlaneGeometry(4, 4),
+  new THREE.MeshBasicMaterial({
+    color: 0x000000,
+    transparent: true,
+    alphaMap: simpleShadow,
+  })
+);
+sphereShadow.rotation.x = -Math.PI * 0.5;
+sphereShadow.position.y = plane.position.y + 0.01;
+scene.add(sphereShadow);
 /**
  * Lights
  */
@@ -62,7 +94,7 @@ const directionalLight = new THREE.DirectionalLight(
   0.4
 );
 directionalLight.position.set(0.346, 0.346, 0.346);
-directionalLight.castShadow = true;
+directionalLight.castShadow = false;
 scene.add(directionalLight);
 // directionalLight Tweaks
 const directionalTweaks = gui.addFolder("directionalLight");
@@ -80,7 +112,6 @@ directionalLight.shadow.camera.near = 1;
 directionalLight.shadow.camera.far = 10;
 directionalLight.shadow.radius = 10;
 
-console.log(directionalLight.shadow);
 const directionalLightCameraHelper = new THREE.CameraHelper(
   directionalLight.shadow.camera
 );
@@ -117,7 +148,7 @@ const spotLight = new THREE.SpotLight(
   1
 );
 spotLight.visible = true;
-spotLight.castShadow = true;
+spotLight.castShadow = false;
 spotLight.position.set(-2, 5, 2);
 scene.add(spotLight);
 scene.add(spotLight.target);
@@ -223,7 +254,7 @@ const renderer = new THREE.WebGLRenderer({
 renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 
 renderer.setSize(sizes.width, sizes.height);
-renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled = false;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 gui.add(renderer.shadowMap, "type", {
   BasicShadowMap: THREE.BasicShadowMap,
@@ -236,7 +267,13 @@ const clock = new THREE.Clock();
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
+  // sphere.position.x = Math.cos(elapsedTime) * 1.5;
+  // sphere.position.z = Math.sin(elapsedTime) * 1.5;
+  // sphere.position.y = Math.abs(Math.sin(elapsedTime * 3));
 
+  // sphereShadow.position.x = sphere.position.x;
+  // sphereShadow.position.z = sphere.position.z;
+  // sphereShadow.material.opacity = 1 - Math.abs(sphere.position.y);
   renderer.render(scene, camera);
   window.requestAnimationFrame(tick);
 };
