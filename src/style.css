@@ -3,9 +3,8 @@
   padding: 0;
 }
 
-html,
-body {
-  overflow: hidden;
+html {
+  background-color: #1e1a20;
 }
 
 .webgl {
@@ -13,4 +12,17 @@ body {
   top: 0;
   left: 0;
   outline: none;
+}
+
+.section {
+  display: flex;
+  align-items: center;
+  height: 100vh;
+  position: relative;
+  font-family: "Cabin", sans-serif;
+  color: #ffeded;
+  text-transform: uppercase;
+  font-size: 7vmin;
+  padding-left: 10%;
+  padding-right: 10%;
 }
