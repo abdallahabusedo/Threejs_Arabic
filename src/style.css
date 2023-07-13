@@ -1,11 +1,8 @@
+@import url("https://fonts.googleapis.com/css2?family=VT323&display=swap");
 * {
   margin: 0;
   padding: 0;
-}
-
-html,
-body {
-  overflow: hidden;
+  font-family: "VT323", monospace;
 }
 
 .webgl {
@@ -14,3 +11,22 @@ body {
   left: 0;
   outline: none;
 }
+
+.section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  position: relative;
+  font-family: "Cabin", sans-serif;
+  color: #ffeded;
+  text-transform: uppercase;
+  font-size: 7vmin;
+  padding-left: 10%;
+  padding-right: 10%;
+  gap: 50px;
+}
+
+/* section:nth-child(odd) {
+  justify-content: flex-end;
+} */
