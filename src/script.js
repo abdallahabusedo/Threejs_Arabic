@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 const scene = new THREE.Scene();
 
@@ -19,21 +19,53 @@ window.addEventListener("resize", () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-const cube = new THREE.Mesh(
-  new THREE.BoxGeometry(4, 4, 4),
-  new THREE.MeshBasicMaterial({ color: 0xff0000 })
+/**
+ * Models
+ */
+let model;
+const gltfLoader = new GLTFLoader();
+gltfLoader.load(
+  "/EyeModel2/scene.gltf",
+  (gltf) => {
+    model = gltf.scene;
+    model.rotation.x += 0.4;
+    model.rotation.z -= 0.4;
+    scene.add(model);
+  },
+  (xhr) => {
+    console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+  }
 );
-scene.add(cube);
+
+const ambientLight = new THREE.AmbientLight();
+scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+scene.add(directionalLight);
+
 const camera = new THREE.PerspectiveCamera(
   75,
   sizes.width / sizes.height,
   0.1,
   100
 );
-camera.position.z = 20;
+camera.position.z = 10;
 scene.add(camera);
 
-const controls = new OrbitControls(camera, canvas);
+const cursor = {};
+cursor.x = 0;
+cursor.y = 0;
+
+window.addEventListener("mousemove", (e) => {
+  cursor.x = e.clientX / sizes.width - 0.5;
+  cursor.y = e.clientY / sizes.height - 0.5;
+
+  if (model) {
+    camera.position.x = -cursor.x * 10;
+    camera.position.y = cursor.y * 10;
+    camera.lookAt(model.position);
+  }
+});
 
 const renderer = new THREE.WebGLRenderer({
   canvas,

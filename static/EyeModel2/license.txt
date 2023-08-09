@@ -1,0 +1,11 @@
+Model Information:
+* title:	Eye
+* source:	https://sketchfab.com/3d-models/eye-07c3674cfc26460d803f8f497f8c0f35
+* author:	germydan (https://sketchfab.com/germydan)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Eye" (https://sketchfab.com/3d-models/eye-07c3674cfc26460d803f8f497f8c0f35) by germydan (https://sketchfab.com/germydan) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
