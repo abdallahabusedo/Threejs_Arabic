@@ -3,13 +3,12 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import fragment from "./shaders/test/fragment.glsl";
 import vertex from "./shaders/test/vertex.glsl";
 import * as dat from "lil-gui";
-const gui = new dat.GUI();
 
-// Textures
+const gui = new dat.GUI();
+const scene = new THREE.Scene();
+
 const textureLoader = new THREE.TextureLoader();
 const texture = textureLoader.load("/textures/palestine.jpg");
-
-const scene = new THREE.Scene();
 
 const canvas = document.querySelector("canvas.webgl");
 
@@ -44,17 +43,19 @@ for (let i = 0; i < count; i++) {
 }
 PlanGeo.setAttribute("aRandom", new THREE.BufferAttribute(randoms, 1));
 
+console.log(randoms);
 const material = new THREE.RawShaderMaterial({
   vertexShader: vertex,
   fragmentShader: fragment,
   side: THREE.DoubleSide,
+  transparent: true,
   uniforms: {
-    // uFrequency: { value: 2 },
-    uFrequency: { value: new THREE.Vector2(1, 2) },
+    uFrequency: { value: new THREE.Vector2(2, 1) },
     uTime: { value: 0 },
     uTexture: { value: texture },
   },
 });
+
 gui
   .add(material.uniforms.uFrequency.value, "x")
   .min(0)
@@ -68,11 +69,11 @@ gui
   .max(10)
   .step(0.01)
   .name("Frequency Y");
-
 const cube = new THREE.Mesh(PlanGeo, material);
 scene.add(cube);
 
 const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
 
 const renderer = new THREE.WebGLRenderer({
   canvas,
