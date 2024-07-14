@@ -77,8 +77,16 @@ gltfLoader.load("/robot_model/scene.gltf", (gltf) => {
     mixer = new THREE.AnimationMixer(model);
     const action = mixer.clipAction(animations[0]);
     action.play();
+    const animationFolder = gui.addFolder("Animation");
+    animationFolder
+      .add(action, "time")
+      .min(0)
+      .max(action.getClip().duration)
+      .step(0.01);
+    animationFolder.add(action, "paused").name("pause");
   }
 });
+
 // Lights
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
@@ -138,19 +146,47 @@ dotScreenPass.uniforms.scale.value = 10;
 dotScreenPass.uniforms.angle.value = Math.PI / 2;
 dotScreenPass.uniforms.center.value = new THREE.Vector2(0.5, 0.5);
 dotScreenPass.setSize(sizes.width / 2, sizes.height);
+const dotScreenPassFolder = gui.addFolder("DotScreen");
+dotScreenPassFolder.add(dotScreenPass, "enabled").name("enabled");
+dotScreenPassFolder
+  .add(dotScreenPass.uniforms.scale, "value")
+  .min(1)
+  .max(20)
+  .step(0.01)
+  .name("scale");
+dotScreenPassFolder
+  .add(dotScreenPass.uniforms.angle, "value")
+  .min(0)
+  .max(Math.PI * 2)
+  .step(0.01)
+  .name("angle");
+dotScreenPassFolder
+  .add(dotScreenPass.uniforms.center.value, "x")
+  .min(0)
+  .max(1)
+  .step(0.01)
+  .name("centerX");
 effectComposer.addPass(dotScreenPass);
 
 // glitch pass
 const glitchPass = new GlitchPass();
 glitchPass.enabled = false;
 glitchPass.goWild = true;
+const glitchPassFolder = gui.addFolder("Glitch");
+glitchPassFolder.add(glitchPass, "enabled").name("enabled");
+glitchPassFolder.add(glitchPass, "goWild").name("goWild");
 effectComposer.addPass(glitchPass);
 
 // RGBShiftPass
 const rgbShiftPass = new ShaderPass(RGBShiftShader);
 rgbShiftPass.enabled = false;
+const rgbShiftPassFolder = gui.addFolder("RGBShift");
+rgbShiftPassFolder.add(rgbShiftPass, "enabled").name("enabled");
 effectComposer.addPass(rgbShiftPass);
 const gammaCorrectionPass = new ShaderPass(GammaCorrectionShader);
+gammaCorrectionPass.enabled = false;
+const gammaCorrectionPassFolder = gui.addFolder("GammaCorrection");
+gammaCorrectionPassFolder.add(gammaCorrectionPass, "enabled").name("enabled");
 effectComposer.addPass(gammaCorrectionPass);
 
 // UnrealBloomPass
@@ -159,6 +195,15 @@ unrealBloomPass.strength = 0.3;
 unrealBloomPass.radius = 1;
 unrealBloomPass.threshold = 0.6;
 unrealBloomPass.enabled = false;
+const unrealBloomPassFolder = gui.addFolder("UnrealBloom");
+unrealBloomPassFolder.add(unrealBloomPass, "enabled").name("enabled");
+unrealBloomPassFolder.add(unrealBloomPass, "strength").min(0).max(2).step(0.01);
+unrealBloomPassFolder.add(unrealBloomPass, "radius").min(0).max(2).step(0.01);
+unrealBloomPassFolder
+  .add(unrealBloomPass, "threshold")
+  .min(0)
+  .max(1)
+  .step(0.01);
 effectComposer.addPass(unrealBloomPass);
 
 const TintShader = {
@@ -192,19 +237,20 @@ const TintShader = {
 
 const tintPass = new ShaderPass(TintShader);
 tintPass.material.uniforms.uTint.value = new THREE.Vector3();
-gui
+const tintPassFolder = gui.addFolder("Tint");
+tintPassFolder
   .add(tintPass.material.uniforms.uTint.value, "x")
   .min(-1)
   .max(1)
   .step(0.001)
   .name("red");
-gui
+tintPassFolder
   .add(tintPass.material.uniforms.uTint.value, "y")
   .min(-1)
   .max(1)
   .step(0.001)
   .name("green");
-gui
+tintPassFolder
   .add(tintPass.material.uniforms.uTint.value, "z")
   .min(-1)
   .max(1)
@@ -212,39 +258,46 @@ gui
   .name("blue");
 effectComposer.addPass(tintPass);
 
-// const DisplacementShader = {
-//   uniforms: {
-//     tDiffuse: { value: null },
-//     uTime: { value: null },
-//   },
-//   vertexShader: `
-//       varying vec2 vUv;
+const DisplacementShader2 = {
+  uniforms: {
+    tDiffuse: { value: null },
+    uTime: { value: null },
+  },
+  vertexShader: `
+      varying vec2 vUv;
 
-//       void main()
-//       {
-//           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      void main()
+      {
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 
-//           vUv = uv;
-//       }
-//   `,
-//   fragmentShader: `
-//       uniform sampler2D tDiffuse;
-//       uniform float uTime;
+          vUv = uv;
+      }
+  `,
+  fragmentShader: `
+      uniform sampler2D tDiffuse;
+      uniform float uTime;
 
-//       varying vec2 vUv;
+      varying vec2 vUv;
 
-//       void main()
-//       {
-//          vec2 newUv = vec2(
-//                 vUv.x,
-//                 vUv.y + sin(vUv.x * 10.0 + uTime) * 0.1
-//             );
-//         vec4 color = texture2D(tDiffuse, newUv);
+      void main()
+      {
+         vec2 newUv = vec2(
+                vUv.x,
+                vUv.y + sin(vUv.x * 10.0 + uTime) * 0.1
+            );
+        vec4 color = texture2D(tDiffuse, newUv);
 
-//         gl_FragColor = color;
-//       }
-//   `,
-// };
+        gl_FragColor = color;
+      }
+  `,
+};
+
+const displacementPass2 = new ShaderPass(DisplacementShader2);
+displacementPass2.material.uniforms.uTime.value = 0;
+const displacementPassFolder2 = gui.addFolder("Displacement2");
+displacementPassFolder2.add(displacementPass2, "enabled").name("enabled");
+effectComposer.addPass(displacementPass2);
+
 const DisplacementShader = {
   uniforms: {
     tDiffuse: { value: null },
@@ -288,6 +341,8 @@ const displacementPass = new ShaderPass(DisplacementShader);
 displacementPass.material.uniforms.uNormalMap.value = textureLoader.load(
   "/textures/interfaceNormalMap.png"
 );
+const displacementPassFolder = gui.addFolder("Displacement");
+displacementPassFolder.add(displacementPass, "enabled").name("enabled");
 effectComposer.addPass(displacementPass);
 
 // Clock
@@ -300,7 +355,7 @@ const tick = () => {
     model.rotation.y = elapsedTime * 0.1;
   }
   if (mixer) mixer.update(Math.min(0.01, elapsedTime));
-  displacementPass.material.uniforms.uTime.value = elapsedTime;
+  displacementPass2.material.uniforms.uTime.value = elapsedTime;
 
   // renderer.render(scene, camera);
   effectComposer.render();
