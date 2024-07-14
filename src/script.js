@@ -1,21 +1,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import * as dat from "dat.gui";
 const scene = new THREE.Scene();
-// scene background color
-const cubeTextureLoader = new THREE.CubeTextureLoader();
-const environmentMapTexture = cubeTextureLoader.load([
-  "/map/px.png",
-  "/map/nx.png",
-  "/map/py.png",
-  "/map/ny.png",
-  "/map/pz.png",
-  "/map/nz.png",
-]);
-scene.background = environmentMapTexture;
 
 const canvas = document.querySelector("canvas.webgl");
+
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
@@ -30,45 +18,18 @@ window.addEventListener("resize", () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-/**
- * Models
- */
-let model;
-const gltfLoader = new GLTFLoader();
-gltfLoader.load(
-  "/robot_model/scene.gltf",
-  (gltf) => {
-    console.log("success");
-    console.log(gltf);
-    model = gltf.scene;
-    model.scale.set(0.5, 0.5, 0.5);
-    scene.add(model);
-  },
-  (progress) => {
-    console.log("progress");
-  },
-  (error) => {
-    console.log("error");
-  }
+const cube = new THREE.Mesh(
+  new THREE.BoxGeometry(4, 4, 4),
+  new THREE.MeshBasicMaterial({ color: 0xff0000 })
 );
-const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-scene.add(ambientLight);
-
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-directionalLight.position.set(0, 10, 0);
-scene.add(directionalLight);
-const directionalLight2 = new THREE.DirectionalLight(0xffffff, 2);
-directionalLight2.position.set(0, 10, 10);
-scene.add(directionalLight2);
-
+scene.add(cube);
 const camera = new THREE.PerspectiveCamera(
   75,
   sizes.width / sizes.height,
   0.1,
-  500
+  100
 );
-camera.position.z = 150;
-camera.position.y = 70;
+camera.position.z = 20;
 scene.add(camera);
 
 const controls = new OrbitControls(camera, canvas);
