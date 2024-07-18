@@ -3,9 +3,13 @@
   padding: 0;
 }
 
-html,
 body {
-  overflow: hidden;
+  margin: 0;
+  height: 200vh;
+} /* Make the page scrollable */
+
+canvas {
+  display: block;
 }
 
 .webgl {
