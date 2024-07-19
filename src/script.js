@@ -1,27 +1,16 @@
-import * as dat from "dat.gui";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import fragmentShader from "./shaders/fragmentShader.glsl";
+import vertexShader from "./shaders/vertexShader.glsl";
 
-const gui = new dat.GUI();
 const scene = new THREE.Scene();
-
-// scene background color
-const cubeTextureLoader = new THREE.CubeTextureLoader();
-const environmentMapTexture = cubeTextureLoader.load([
-  "/map/px.png",
-  "/map/nx.png",
-  "/map/py.png",
-  "/map/ny.png",
-  "/map/pz.png",
-  "/map/nz.png",
-]);
-scene.background = environmentMapTexture;
 
 const canvas = document.querySelector("canvas.webgl");
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
+  pixelRation: Math.min(window.devicePixelRatio, 2),
 };
 
 window.addEventListener("resize", () => {
@@ -60,8 +49,9 @@ const gltfLoader = new GLTFLoader();
 gltfLoader.load("/robot_model/scene.gltf", (gltf) => {
   model = gltf.scene;
   model.scale.set(0.5, 0.5, 0.5);
+  model.position.set(0, -6, 0);
   scene.add(model);
-  updateAllMaterials();
+  // updateAllMaterials();
 
   animations = gltf.animations;
   if (animations && animations.length) {
@@ -106,10 +96,10 @@ const camera = new THREE.PerspectiveCamera(
   5000
 );
 camera.position.z = 150;
-camera.position.y = 20;
+camera.position.y = 0;
 scene.add(camera);
 
-// const controls = new OrbitControls(camera, canvas);
+const controls = new OrbitControls(camera, canvas);
 
 const renderer = new THREE.WebGLRenderer({
   canvas,
@@ -123,7 +113,27 @@ renderer.toneMappingExposure = 1.5;
 renderer.physicallyCorrectLights = true;
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.setSize(sizes.width, sizes.height);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setPixelRatio(sizes.pixelRation);
+
+/**
+ * Particles
+ */
+const particlesGeometry = new THREE.PlaneGeometry(10, 10, 32, 32);
+
+const particlesMaterial = new THREE.ShaderMaterial({
+  vertexShader,
+  fragmentShader,
+  uniforms: {
+    uResolution: new THREE.Uniform(
+      new THREE.Vector2(
+        sizes.width * sizes.pixelRatio,
+        sizes.height * sizes.pixelRatio
+      )
+    ),
+  },
+});
+const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+scene.add(particles);
 
 // Clock
 const clock = new THREE.Clock();
