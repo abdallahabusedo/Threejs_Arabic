@@ -1,7 +1,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-
+import particlesVertexShader from "./shaders/particlesShader/vertexShader.glsl";
+import particlesFragmentShader from "./shaders/particlesShader/fragmentShader.glsl";
+import gsap from "gsap";
 const scene = new THREE.Scene();
 
 const canvas = document.querySelector("canvas.webgl");
@@ -25,15 +27,23 @@ let particles;
 const loader = new GLTFLoader();
 loader.load("/train/scene.gltf", (gltf) => {
   gltfMesh = gltf.scene;
-  // turn gltf to points
 
   gltfMesh.traverse((child) => {
     if (child instanceof THREE.Mesh) {
-      child.material = new THREE.PointsMaterial({
-        size: 0.02,
-        sizeAttenuation: true,
+      child.material = new THREE.ShaderMaterial({
+        vertexShader: particlesVertexShader,
+        fragmentShader: particlesFragmentShader,
+        uniforms: {
+          size: { value: 10 },
+          color: { value: new THREE.Color(0xff0000) },
+        },
+        transparent: true,
       });
     }
+  });
+
+  canvas.addEventListener("click", () => {
+    gsap.to(gltfMesh.rotation, { y: "+=2", duration: 1 });
   });
 
   scene.add(gltfMesh);
