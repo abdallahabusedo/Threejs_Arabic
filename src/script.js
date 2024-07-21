@@ -6,6 +6,17 @@ import vertexShader from "./shaders/vertexShader.glsl";
 
 const scene = new THREE.Scene();
 
+const cubeTextureLoader = new THREE.CubeTextureLoader();
+const environmentMap = cubeTextureLoader.load([
+  "/map/px.png",
+  "/map/nx.png",
+  "/map/py.png",
+  "/map/ny.png",
+  "/map/pz.png",
+  "/map/nz.png",
+]);
+scene.background = environmentMap;
+
 const canvas = document.querySelector("canvas.webgl");
 const sizes = {
   width: window.innerWidth,
@@ -99,7 +110,7 @@ camera.position.z = 150;
 camera.position.y = 0;
 scene.add(camera);
 
-const controls = new OrbitControls(camera, canvas);
+// const controls = new OrbitControls(camera, canvas);
 
 const renderer = new THREE.WebGLRenderer({
   canvas,
@@ -114,26 +125,6 @@ renderer.physicallyCorrectLights = true;
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(sizes.pixelRation);
-
-/**
- * Particles
- */
-const particlesGeometry = new THREE.PlaneGeometry(10, 10, 32, 32);
-
-const particlesMaterial = new THREE.ShaderMaterial({
-  vertexShader,
-  fragmentShader,
-  uniforms: {
-    uResolution: new THREE.Uniform(
-      new THREE.Vector2(
-        sizes.width * sizes.pixelRatio,
-        sizes.height * sizes.pixelRatio
-      )
-    ),
-  },
-});
-const particles = new THREE.Points(particlesGeometry, particlesMaterial);
-scene.add(particles);
 
 // Clock
 const clock = new THREE.Clock();
